@@ -4,4 +4,9 @@ spring:
   liquibase:
     enabled: on
     changeLog: classpath:/db/changelog/db.changelog-master.xml
+  datasource:
+    url: POSTGRES_URL
+    password: POSTGRES_PASSWORD
+    username: POSTGRES_USER
+
 
