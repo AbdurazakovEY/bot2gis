@@ -2,7 +2,7 @@ spring:
   application:
     name: bot2gis
   liquibase:
-    enabled: off
+    enabled: on
     changeLog: classpath:/db/changelog/db.changelog-master.xml
   datasource:
     url: ${POSTGRES_URL}
