@@ -22,15 +22,16 @@ class EndpointPOI(
     }
 
     @GetMapping
-    fun get(@RequestHeader("X-Telegram-Init-Data") tgInitData: String): List<POI> {
-        val user = this.tg.extractTgUser(tgInitData) ?: return emptyList()
+    fun get(@RequestHeader("X-Telegram-Init-Data", required = false) tgInitData: String?): List<POI> {
+        val user = tgInitData?.run(this.tg::extractTgUser) ?: return getAllPOI()
         return getAllPOI(user.id)
     }
 
 
     private fun getAllPOI(userId: Long): List<POI> =
         this.jdbc.query({ pss ->
-            val ps = pss.prepareStatement("""
+            val ps = pss.prepareStatement(
+                """
             select p.*, up.status 
             from POIs p 
                 right join user_POIs up on p.id = up.location_id 
@@ -39,6 +40,8 @@ class EndpointPOI(
             ps.setLong(1, userId)
             ps
         }, rm)
+
+    private fun getAllPOI(): List<POI> = this.jdbc.query("select *, 'locked' as status from POIs", rm)
 }
 
 internal class POIrm : RowMapper<POI> {
@@ -53,7 +56,9 @@ internal class POIrm : RowMapper<POI> {
             rs.getDouble("latitude"),
             rs.getDouble("longitude"),
             rs.getInt("radius_m"),
-        )
+            rs.getString("status"),
+
+            )
     }
 }
 
@@ -67,4 +72,5 @@ data class POI(
     val latitude: Double,
     val longitude: Double,
     val radius: Int,
+    val status: String,
 )
