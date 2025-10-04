@@ -33,15 +33,15 @@ class EndpointPOI(
             val ps = pss.prepareStatement(
                 """
             select p.*, up.status 
-            from POIs p 
-                right join user_POIs up on p.id = up.location_id 
+            from public.POIs p 
+                right join public.user_POIs up on p.id = up.location_id 
             where up.user_id = ?"""
             )
             ps.setLong(1, userId)
             ps
         }, rm)
 
-    private fun getAllPOI(): List<POI> = this.jdbc.query("select *, 'locked' as status from POIs", rm)
+    private fun getAllPOI(): List<POI> = this.jdbc.query("select *, 'locked' as status from public.POIs", rm)
 }
 
 internal class POIrm : RowMapper<POI> {
